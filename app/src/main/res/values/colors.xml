@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 主色 -->
+    <color name="primary">#6200EE</color>
+    <color name="primary_dark">#3700B3</color>
+    <color name="accent">#03DAC5</color>
+    <color name="primary_light">#BB86FC</color>
+
+    <!-- 表面/背景 -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F5F5F5</color>
+    <color name="background">#FAFAFA</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- 文本 -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- 分隔线 -->
+    <color name="divider">#E0E0E0</color>
+
+    <!-- 段落颜色 -->
+    <color name="verse_color">#4CAF50</color>
+    <color name="chorus_color">#FF9800</color>
+    <color name="bridge_color">#9C27B0</color>
+    <color name="hook_color">#F44336</color>
+
+    <!-- 押韵高亮 -->
+    <color name="rhyme_highlight">#FFEB3B</color>
+    <color name="rhyme_group_tag">#E1BEE7</color>
+
+    <!-- Chip -->
+    <color name="chip_selected">#6200EE</color>
+    <color name="chip_unselected">#E0E0E0</color>
+    <color name="chip_text_selected">#FFFFFF</color>
+    <color name="chip_text_unselected">#424242</color>
+
+    <!-- 通用 -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="overlay_dark">#80000000</color>
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">歌词助手</string>
+
+    <!-- 列表页 -->
+    <string name="search_hint">搜索歌词标题或标签…</string>
+    <string name="new_lyric">新建歌词</string>
+    <string name="nav_list">歌词列表</string>
+    <string name="nav_memorize">背诵</string>
+    <string name="empty_list">还没有歌词，点击 + 新建一首</string>
+
+    <!-- 编辑页 -->
+    <string name="hint_title">歌词标题</string>
+    <string name="hint_tags">标签（用逗号分隔）</string>
+    <string name="add_line">添加一行</string>
+    <string name="section_verse">主歌</string>
+    <string name="section_chorus">副歌</string>
+    <string name="section_bridge">桥段</string>
+    <string name="section_hook">Hook</string>
+    <string name="rhyme_suggest">押韵推荐</string>
+    <string name="save">保存</string>
+    <string name="start_recording">录音</string>
+    <string name="stop_recording">停止</string>
+
+    <!-- 押韵面板 -->
+    <string name="rhyme_single">单押</string>
+    <string name="rhyme_double">双押</string>
+    <string name="rhyme_input_hint">输入词语</string>
+    <string name="rhyme_search">搜索</string>
+    <string name="insert">插入</string>
+
+    <!-- 详情页 -->
+    <string name="play">播放</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="memorize">背诵</string>
+    <string name="no_recordings">暂无录音</string>
+
+    <!-- 背诵页 -->
+    <string name="prev_line">上一句</string>
+    <string name="next_line">下一句</string>
+    <string name="reveal">显示/隐藏</string>
+    <string name="proficiency">熟练度</string>
+    <string name="line_progress">第 %1$d / %2$d 句</string>
+
+    <!-- 通用 -->
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
+    <string name="delete_confirm">确认删除这首歌词？</string>
+    <string name="save_success">保存成功</string>
+    <string name="save_failed">保存失败</string>
+    <string name="record_permission_denied">需要录音权限</string>
+</resources>

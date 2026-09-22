@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/edit_line_bg"
+    android:layout_margin="6dp"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <!-- 段落选择 + 押韵标记 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/sp_section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btn_rhyme"
+            android:layout_width="48dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="押"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_add_line"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="+" />
+
+        <Button
+            android:id="@+id/btn_delete_line"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="×" />
+    </LinearLayout>
+
+    <!-- 行文本输入 -->
+    <EditText
+        android:id="@+id/et_line_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:background="@android:color/transparent"
+        android:hint="输入歌词…"
+        android:inputType="textMultiLine"
+        android:maxLines="3"
+        android:textSize="15sp" />
+
+</LinearLayout>
