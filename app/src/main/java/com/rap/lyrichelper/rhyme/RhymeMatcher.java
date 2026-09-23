@@ -45,6 +45,11 @@ public class RhymeMatcher {
 
     private boolean loaded = false;
 
+    /** 词典是否加载完成（2.5 万词在后台线程加载，UI 据此提示"加载中"） */
+    public boolean isLoaded() {
+        return loaded;
+    }
+
     /**
      * 从 raw/rhyme_dict.json 加载词典，预计算每个词的单押韵组和双押韵组对。
      */
