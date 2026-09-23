@@ -52,6 +52,17 @@
             android:text="@string/rhyme_double" />
     </RadioGroup>
 
+    <!-- 大模型推荐状态/配置入口（常驻可见，点击配置 API Key） -->
+    <TextView
+        android:id="@+id/tv_llm_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:padding="4dp"
+        android:text="🤖 智能推荐未配置 · 点击设置 API Key"
+        android:textColor="@color/text_hint"
+        android:textSize="12sp" />
+
     <!-- 搜索按钮 -->
     <Button
         android:id="@+id/btn_rhyme_search"

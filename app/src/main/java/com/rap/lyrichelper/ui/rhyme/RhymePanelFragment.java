@@ -50,6 +50,9 @@ public class RhymePanelFragment extends BottomSheetDialogFragment {
     /** 输入防抖：实时搜索每次按键都触发，LLM 模式下会连发请求 */
     private final Handler debounce = new Handler(Looper.getMainLooper());
     private Runnable pendingSearch;
+    private TextView tvEmpty;
+    private TextView tvLlmStatus;
+    private String lastInput;
 
     public interface OnWordInsertListener {
         void onWordInsert(int linePosition, String word);
@@ -90,7 +93,9 @@ public class RhymePanelFragment extends BottomSheetDialogFragment {
         Button btnSearch = view.findViewById(R.id.btn_rhyme_search);
         RadioGroup rgType = view.findViewById(R.id.rg_rhyme_type);
         RecyclerView rvResults = view.findViewById(R.id.rv_rhyme_results);
-        TextView tvEmpty = view.findViewById(R.id.tv_rhyme_empty);
+        tvEmpty = view.findViewById(R.id.tv_rhyme_empty);
+        tvLlmStatus = view.findViewById(R.id.tv_llm_status);
+        refreshLlmStatus();
 
         // 初始输入
         if (getArguments() != null) {
@@ -153,7 +158,8 @@ public class RhymePanelFragment extends BottomSheetDialogFragment {
     }
 
     private void runSearch(String input, TextView tvEmpty) {
-        // 大模型优先：中英文通吃、双押词组、按说唱可用性排序
+        lastInput = input;
+        // 大模型优先：中英文通吃、双押词组、中英混押、按说唱可用性排序
         if (LlmRhymeService.hasKey(appContext)) {
             showEmpty(tvEmpty, "🤖 大模型生成押韵词中…", null);
             LlmRhymeService.fetchRhymes(appContext, input, rhymeType == 1, (words, error) -> {
@@ -166,9 +172,19 @@ public class RhymePanelFragment extends BottomSheetDialogFragment {
                             "在线推荐失败：" + (error == null ? "无结果" : error) + "，已回退本地词库");
                 }
             });
+        } else if (hasLatin(input)) {
+            // 中英混押（fake love ↔ 废话）本地算法做不了，明确引导配置大模型
+            showEmpty(tvEmpty, "含英文输入需要大模型支持中英混押。\n点此配置 API Key",
+                    v -> showConfigDialog());
         } else {
             searchLocal(input, tvEmpty, null);
         }
+    }
+
+    /** 是否含英文字母（≥2 个连续字母才算英文词，排除中文里夹的标点数字） */
+    private static boolean hasLatin(String s) {
+        if (s == null) return false;
+        return s.matches(".*[a-zA-Z]{2,}.*");
     }
 
     /** 本地词典匹配；无结果时引导配置大模型 */
@@ -208,6 +224,15 @@ public class RhymePanelFragment extends BottomSheetDialogFragment {
         tv.setClickable(l != null);
     }
 
+    /** 常驻状态行：已开启/未配置都显示，点击进入配置 */
+    private void refreshLlmStatus() {
+        if (tvLlmStatus == null || appContext == null) return;
+        boolean on = LlmRhymeService.hasKey(appContext);
+        tvLlmStatus.setText(on ? "🤖 智能推荐已开启（在线大模型）· 点击修改配置"
+                : "🤖 智能推荐未配置 · 点击设置 API Key（支持中英混押）");
+        tvLlmStatus.setOnClickListener(v -> showConfigDialog());
+    }
+
     /** 大模型接入配置：Key / Base URL / 模型名，存 SharedPreferences */
     private void showConfigDialog() {
         Context ctx = getContext();
@@ -234,11 +259,18 @@ public class RhymePanelFragment extends BottomSheetDialogFragment {
         new AlertDialog.Builder(ctx)
                 .setTitle("接入大模型押韵推荐")
                 .setView(box)
-                .setPositiveButton("保存", (d, w) -> sp.edit()
-                        .putString("api_key", etKey.getText().toString().trim())
-                        .putString("base_url", etBase.getText().toString().trim())
-                        .putString("model", etModel.getText().toString().trim())
-                        .apply())
+                .setPositiveButton("保存", (d, w) -> {
+                    sp.edit()
+                            .putString("api_key", etKey.getText().toString().trim())
+                            .putString("base_url", etBase.getText().toString().trim())
+                            .putString("model", etModel.getText().toString().trim())
+                            .apply();
+                    refreshLlmStatus();
+                    // 配置完自动重搜，不用再点一次按钮
+                    if (lastInput != null && !lastInput.isEmpty()) {
+                        doSearch(lastInput, tvEmpty);
+                    }
+                })
                 .setNegativeButton("取消", null)
                 .show();
     }

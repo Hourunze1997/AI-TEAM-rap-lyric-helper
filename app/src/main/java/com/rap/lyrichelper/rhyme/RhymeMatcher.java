@@ -28,12 +28,15 @@ public class RhymeMatcher {
         final int frequency;
         final String singleGroup;
         final String doubleGroup;
+        /** 末字声调：1-4 四声、5 轻声、0 未知 */
+        final int tone;
 
-        DictEntry(String word, int frequency, String singleGroup, String doubleGroup) {
+        DictEntry(String word, int frequency, String singleGroup, String doubleGroup, int tone) {
             this.word = word;
             this.frequency = frequency;
             this.singleGroup = singleGroup;
             this.doubleGroup = doubleGroup;
+            this.tone = tone;
         }
     }
 
@@ -76,12 +79,13 @@ public class RhymeMatcher {
                 int frequency = obj.optInt("frequency", 0);
                 if (word.isEmpty()) continue;
 
-                // 预计算单押韵组（末字）
+                // 预计算单押韵组（末字）与声调（同调优先排序用）
                 String singleGroup = PinyinHelper.getRhymeGroupOfWord(word);
                 // 预计算双押韵组对（末两字）
                 String doubleGroup = RhymeGroupMapper.getRhymeGroupPair(word);
+                int tone = PinyinHelper.getToneOfWord(word);
 
-                DictEntry entry = new DictEntry(word, frequency, singleGroup, doubleGroup);
+                DictEntry entry = new DictEntry(word, frequency, singleGroup, doubleGroup, tone);
                 entries.add(entry);
 
                 if (!singleGroup.isEmpty()) {
@@ -100,7 +104,8 @@ public class RhymeMatcher {
     }
 
     /**
-     * 单押：取 inputWord 末字韵组，返回同韵组词按 frequency 降序。
+     * 单押：取 inputWord 末字韵组，返回同韵组词——同声调优先，其余按词频。
+     * RhymeWord 的第二行文案带声调说明（"同韵·同调"/"同韵·二声"）。
      */
     public List<RhymeWord> findSingleRhymes(String inputWord) {
         if (!loaded || inputWord == null || inputWord.isEmpty()) return new ArrayList<>();
@@ -111,20 +116,27 @@ public class RhymeMatcher {
         List<RhymeWord> result = new ArrayList<>();
         List<DictEntry> candidates = singleIndex.get(group);
         if (candidates != null) {
-            for (DictEntry entry : candidates) {
+            final int inTone = PinyinHelper.getToneOfWord(inputWord);
+            List<DictEntry> sorted = new ArrayList<>(candidates);
+            Collections.sort(sorted, (a, b) -> {
+                boolean ta = inTone != 0 && a.tone == inTone;
+                boolean tb = inTone != 0 && b.tone == inTone;
+                if (ta != tb) return ta ? -1 : 1;
+                return b.frequency - a.frequency;
+            });
+            for (DictEntry entry : sorted) {
                 if (!entry.word.equals(inputWord)) {
-                    result.add(new RhymeWord(entry.word, group, entry.frequency));
+                    result.add(new RhymeWord(entry.word,
+                            toneNote(inTone, entry.tone), entry.frequency));
                 }
             }
         }
-
-        Collections.sort(result, (a, b) -> b.frequency - a.frequency);
         return result;
     }
 
     /**
      * 双押：取 inputWord 末两字韵组对，返回韵组对相等的词，
-     * 按 frequency 降序。
+     * 同声调优先，其余按词频。
      */
     public List<RhymeWord> findDoubleRhymes(String inputWord) {
         if (!loaded || inputWord == null || inputWord.isEmpty()) return new ArrayList<>();
@@ -135,14 +147,36 @@ public class RhymeMatcher {
         List<RhymeWord> result = new ArrayList<>();
         List<DictEntry> candidates = doubleIndex.get(pair);
         if (candidates != null) {
-            for (DictEntry entry : candidates) {
+            final int inTone = PinyinHelper.getToneOfWord(inputWord);
+            List<DictEntry> sorted = new ArrayList<>(candidates);
+            Collections.sort(sorted, (a, b) -> {
+                boolean ta = inTone != 0 && a.tone == inTone;
+                boolean tb = inTone != 0 && b.tone == inTone;
+                if (ta != tb) return ta ? -1 : 1;
+                return b.frequency - a.frequency;
+            });
+            for (DictEntry entry : sorted) {
                 if (!entry.word.equals(inputWord)) {
-                    result.add(new RhymeWord(entry.word, pair, entry.frequency));
+                    result.add(new RhymeWord(entry.word,
+                            "双押·" + toneNote(inTone, entry.tone), entry.frequency));
                 }
             }
         }
-
-        Collections.sort(result, (a, b) -> b.frequency - a.frequency);
         return result;
+    }
+
+    /** 第二行文案：同调标"同调"，否则标对方声调 */
+    private static String toneNote(int inTone, int entryTone) {
+        if (inTone != 0 && entryTone == inTone) return "同韵·同调";
+        String name;
+        switch (entryTone) {
+            case 1: name = "一声"; break;
+            case 2: name = "二声"; break;
+            case 3: name = "三声"; break;
+            case 4: name = "四声"; break;
+            case 5: name = "轻声"; break;
+            default: name = ""; break;
+        }
+        return name.isEmpty() ? "同韵" : "同韵·" + name;
     }
 }

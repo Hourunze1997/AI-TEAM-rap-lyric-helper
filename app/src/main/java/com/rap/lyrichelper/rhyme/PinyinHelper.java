@@ -14,11 +14,19 @@ public class PinyinHelper {
 
     private static final HanyuPinyinOutputFormat FORMAT;
 
+    /** 带声调数字的输出格式（xiang3），声调感知排序用 */
+    private static final HanyuPinyinOutputFormat TONE_FORMAT;
+
     static {
         FORMAT = new HanyuPinyinOutputFormat();
         FORMAT.setCaseType(HanyuPinyinCaseType.LOWERCASE);
         FORMAT.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
         FORMAT.setVCharType(HanyuPinyinVCharType.WITH_U_UNICODE);
+
+        TONE_FORMAT = new HanyuPinyinOutputFormat();
+        TONE_FORMAT.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+        TONE_FORMAT.setToneType(HanyuPinyinToneType.WITH_TONE_NUMBER);
+        TONE_FORMAT.setVCharType(HanyuPinyinVCharType.WITH_U_UNICODE);
     }
 
     /**
@@ -38,6 +46,25 @@ public class PinyinHelper {
         char lastChar = word.charAt(word.length() - 1);
         String finalStr = getFinalOfChar(lastChar);
         return RhymeGroupMapper.getRhymeGroup(finalStr);
+    }
+
+    /**
+     * 取词末字声调：1-4 四声、5 轻声；非汉字/无法识别返回 0。
+     */
+    public static int getToneOfWord(String word) {
+        if (word == null || word.isEmpty()) return 0;
+        char c = word.charAt(word.length() - 1);
+        try {
+            String[] arr = net.sourceforge.pinyin4j.PinyinHelper
+                    .toHanyuPinyinStringArray(c, TONE_FORMAT);
+            if (arr != null && arr.length > 0) {
+                String p = arr[0];
+                char last = p.charAt(p.length() - 1);
+                if (last >= '1' && last <= '5') return last - '0';
+            }
+        } catch (BadHanyuPinyinOutputFormatCombination ignored) {
+        }
+        return 0;
     }
 
     /**
